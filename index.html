@@ -1,534 +1,183 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Kartupelis TV · Neon Myth Studio</title>
-  <style>
-    :root {
-      --bg: #02030a;
-      --ink: #f2f6ff;
-      --muted: #95a4c7;
-      --cyan: #5ef2ff;
-      --violet: #8f6bff;
-      --rose: #ff5ea8;
-      --line: rgba(255, 255, 255, 0.18);
-      --card: rgba(10, 14, 30, 0.62);
-    }
-
-    * { box-sizing: border-box; }
-    html, body {
-      margin: 0;
-      color: var(--ink);
-      background: var(--bg);
-      font-family: "Inter", "Avenir Next", system-ui, sans-serif;
-      scroll-behavior: smooth;
-    }
-
-    body {
-      overflow-x: hidden;
-      background:
-        radial-gradient(circle at 20% -20%, rgba(94, 242, 255, 0.18), transparent 42%),
-        radial-gradient(circle at 100% 0%, rgba(143, 107, 255, 0.2), transparent 40%),
-        linear-gradient(180deg, #02030a 0%, #06091a 52%, #03030c 100%);
-    }
-
-    #webgl-bg {
-      position: fixed;
-      inset: 0;
-      width: 100%;
-      height: 100%;
-      z-index: 0;
-      pointer-events: none;
-      opacity: 0.75;
-    }
-
-    .noise {
-      position: fixed;
-      inset: 0;
-      z-index: 1;
-      pointer-events: none;
-      opacity: 0.09;
-      mix-blend-mode: soft-light;
-      background-image: url("https://www.transparenttextures.com/patterns/noise-pattern-with-subtle-cross-lines.png");
-    }
-
-    main {
-      position: relative;
-      z-index: 2;
-      width: min(1180px, 92vw);
-      margin: 0 auto;
-      padding: 2rem 0 4rem;
-    }
-
-    .panel {
-      border: 1px solid var(--line);
-      background: var(--card);
-      backdrop-filter: blur(10px);
-      border-radius: 20px;
-      box-shadow: inset 0 0 0 1px rgba(255,255,255,0.03), 0 24px 70px rgba(0,0,0,0.45);
-    }
-
-    .hero {
-      min-height: 92vh;
-      padding: clamp(1.5rem, 4vw, 3rem);
-      display: grid;
-      align-content: center;
-      gap: 1.1rem;
-      overflow: hidden;
-      position: relative;
-    }
-
-    .hero::after {
-      content: "";
-      position: absolute;
-      inset: auto -10% -38% auto;
-      width: 52vw;
-      max-width: 620px;
-      aspect-ratio: 1;
-      border-radius: 18% 82% 67% 33% / 44% 27% 73% 56%;
-      background: radial-gradient(circle at 30% 30%, rgba(94, 242, 255, 0.35), rgba(143, 107, 255, 0.1) 52%, transparent 72%);
-      filter: blur(4px);
-    }
-
-    .eyebrow {
-      margin: 0;
-      text-transform: uppercase;
-      letter-spacing: 0.2em;
-      color: var(--cyan);
-      font-size: 0.75rem;
-      font-weight: 700;
-    }
-
-    h1 {
-      margin: 0;
-      font-size: clamp(2rem, 7.8vw, 6.5rem);
-      line-height: 0.9;
-      text-transform: uppercase;
-      max-width: 12ch;
-      text-wrap: balance;
-    }
-
-    h1 .reveal-char,
-    h2 .reveal-char,
-    h3 .reveal-char {
-      transition-duration: 0.4s;
-    }
-
-    .lead {
-      margin: 0;
-      max-width: 62ch;
-      color: #d4dcf0;
-      font-size: clamp(1rem, 2vw, 1.2rem);
-    }
-
-    .stats {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.7rem;
-      margin-top: 0.4rem;
-    }
-
-    .stat {
-      border: 1px solid var(--line);
-      border-radius: 999px;
-      padding: 0.42rem 0.85rem;
-      font-size: 0.78rem;
-      color: var(--muted);
-      background: rgba(255,255,255,0.03);
-    }
-
-    section.story {
-      margin-top: 1rem;
-      display: grid;
-      grid-template-columns: 1.15fr 0.85fr;
-      gap: 1rem;
-    }
-
-    .mode4 {
-      margin-top: 1rem;
-      display: grid;
-      gap: 1rem;
-    }
-
-    .mode4-intro {
-      padding: 1.2rem;
-    }
-
-    .mode-grid {
-      display: grid;
-      gap: 1rem;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
-
-    .mode-blog {
-      padding: 1.2rem;
-      min-height: 300px;
-      display: grid;
-      align-content: start;
-      gap: 0.75rem;
-    }
-
-    .mode-blog:nth-child(even) {
-      transform: translateY(2.8rem);
-    }
-
-    .mode-blog h3 {
-      margin: 0;
-      font-size: clamp(1.6rem, 4vw, 3.1rem);
-      line-height: 0.92;
-      text-transform: uppercase;
-      max-width: 12ch;
-    }
-
-    .column { padding: 1.2rem; }
-
-    h2 {
-      margin: 0;
-      font-size: clamp(1.25rem, 2.6vw, 2.2rem);
-      text-transform: uppercase;
-      letter-spacing: 0.03em;
-    }
-
-    .note {
-      color: var(--muted);
-      margin: 0.8rem 0 0;
-      max-width: 62ch;
-    }
-
-    .characters {
-      margin-top: 1rem;
-      display: grid;
-      gap: 0.75rem;
-    }
-
-    .character {
-      border: 1px solid var(--line);
-      border-radius: 14px;
-      padding: 0.8rem;
-      background: rgba(8, 11, 26, 0.65);
-    }
-
-    .character strong {
-      display: block;
-      letter-spacing: 0.05em;
-      color: #fff;
-      text-transform: uppercase;
-      font-size: 0.8rem;
-      margin-bottom: 0.35rem;
-    }
-
-    .character p { margin: 0; color: #cad4ec; }
-
-    .scroll-track {
-      margin-top: 1rem;
-      border: 1px dashed rgba(94, 242, 255, 0.45);
-      border-radius: 16px;
-      padding: 1rem;
-      background: linear-gradient(145deg, rgba(94, 242, 255, 0.08), rgba(255, 94, 168, 0.08));
-    }
-
-    .quote-line {
-      margin: 0 0 0.7rem;
-      font-size: clamp(1.05rem, 2.3vw, 1.6rem);
-      line-height: 1.2;
-      font-weight: 650;
-    }
-
-    .quote-line:last-child { margin-bottom: 0; }
-
-    .reveal {
-      --active: 0;
-      display: inline-flex;
-      flex-wrap: wrap;
-      gap: 0.02em;
-      white-space: pre-wrap;
-    }
-
-    .reveal-char {
-      opacity: calc(0.12 + var(--lit, 0) * 0.88);
-      transform: translateY(calc((1 - var(--lit, 0)) * 20px)) rotateX(calc((1 - var(--lit, 0)) * 35deg));
-      color: color-mix(in srgb, #e7eeff calc(20% + var(--lit, 0) * 52%), var(--cyan));
-      text-shadow: 0 0 calc(var(--lit, 0) * 12px) rgba(94, 242, 255, 0.55);
-      transition: transform 0.28s ease, opacity 0.28s ease, color 0.28s ease;
-      will-change: transform, opacity;
-    }
-
-    .frame {
-      margin-top: 0.9rem;
-      border: 1px solid var(--line);
-      border-radius: 14px;
-      overflow: hidden;
-      position: relative;
-    }
-
-    .frame img {
-      display: block;
-      width: 100%;
-      max-height: 440px;
-      object-fit: cover;
-      filter: saturate(1.2) contrast(1.07);
-    }
-
-    .frame figcaption {
-      padding: 0.75rem;
-      color: var(--muted);
-      font-size: 0.85rem;
-      border-top: 1px solid var(--line);
-      background: rgba(4, 5, 12, 0.76);
-    }
-
-    footer {
-      margin-top: 1rem;
-      padding: 1rem;
-      color: #b7c4e6;
-      font-size: 0.85rem;
-      display: flex;
-      justify-content: space-between;
-      gap: 1rem;
-      flex-wrap: wrap;
-    }
-
-    @media (max-width: 920px) {
-      section.story { grid-template-columns: 1fr; }
-      .mode-grid { grid-template-columns: 1fr; }
-      .mode-blog:nth-child(even) { transform: none; }
-      .hero { min-height: 80vh; }
-    }
-  </style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Reinis Kalnaellis · Director, Photographer, Visual Storyteller</title>
+<meta name="description" content="Official website of Reinis Kalnaellis, Latvian director, photographer, and visual storyteller working across animation, cinema, and atmospheric image-making.">
+<style>
+:root{--bg:#0a0b10;--panel:rgba(255,255,255,.06);--line:rgba(255,255,255,.12);--text:#f4f0e8;--muted:#b8b1a3;--gold:#d7b988;--blue:#9fb5ff;--shadow:0 30px 80px rgba(0,0,0,.38);--max:1180px}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;color:var(--text);font:16px/1.6 Inter,system-ui,-apple-system,Segoe UI,sans-serif;background:radial-gradient(circle at top left, rgba(159,181,255,.12), transparent 30%),radial-gradient(circle at 80% 0%, rgba(215,185,136,.12), transparent 28%),linear-gradient(180deg,#07080c,#0c0e14 45%,#08090d)}body:before{content:"";position:fixed;inset:0;pointer-events:none;opacity:.28;background:linear-gradient(rgba(255,255,255,.03) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.03) 1px,transparent 1px);background-size:40px 40px;mask-image:radial-gradient(circle at center,black,transparent 78%)}a{color:inherit;text-decoration:none}.wrap{width:min(var(--max),calc(100vw - 2rem));margin:0 auto}.topbar{position:sticky;top:0;z-index:50;backdrop-filter:blur(18px);background:rgba(8,10,16,.6);border-bottom:1px solid rgba(255,255,255,.06)}.topbar .wrap{display:flex;justify-content:space-between;align-items:center;gap:1rem;padding:.95rem 0}.brand strong{display:block;font-size:.95rem;letter-spacing:.14em;text-transform:uppercase}.brand span{display:block;color:var(--muted);font-size:.76rem;letter-spacing:.14em;text-transform:uppercase}nav{display:flex;gap:1rem;flex-wrap:wrap}nav a{color:var(--muted);font-size:.9rem;padding:.42rem .7rem;border-radius:999px}nav a:hover{background:rgba(255,255,255,.06);color:var(--text)}.hero{padding:4.8rem 0 1rem}.shell,.card,.contact{border:1px solid var(--line);background:var(--panel);box-shadow:var(--shadow)}.shell{border-radius:36px;padding:clamp(1.4rem,3vw,2rem);background:linear-gradient(145deg,rgba(255,255,255,.08),rgba(255,255,255,.03)),radial-gradient(circle at 84% 10%, rgba(159,181,255,.14), transparent 22%),radial-gradient(circle at 16% 0%, rgba(215,185,136,.14), transparent 30%),rgba(12,14,20,.82)}.hero-grid{display:grid;grid-template-columns:1.12fr .88fr;gap:1.2rem}.eyebrow{margin:0 0 .75rem;color:var(--gold);text-transform:uppercase;letter-spacing:.18em;font-size:.78rem;font-weight:700}h1{margin:0;max-width:10ch;font-size:clamp(3rem,9vw,6.6rem);line-height:.92;letter-spacing:-.05em}.lead{margin:1.1rem 0 0;max-width:62ch;color:#ddd7cb;font-size:clamp(1rem,2vw,1.18rem)}.actions{display:flex;flex-wrap:wrap;gap:.8rem;margin-top:1.5rem}.btn{display:inline-flex;align-items:center;justify-content:center;min-height:48px;padding:.85rem 1.15rem;border-radius:999px;border:1px solid var(--line);font-weight:700}.btn.primary{background:linear-gradient(135deg, rgba(215,185,136,.26), rgba(215,185,136,.1));border-color:rgba(215,185,136,.35)}.btn.secondary{background:rgba(255,255,255,.03)}.btn:hover{transform:translateY(-1px)}.hero-note{margin-top:1rem;color:var(--muted);font-size:.94rem}.proof{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.9rem;align-content:start}.card{border-radius:26px;padding:1.05rem 1rem;box-shadow:inset 0 1px 0 rgba(255,255,255,.03)}.proof strong,.metric strong{display:block;font-size:1.35rem;line-height:1;letter-spacing:-.04em;margin-bottom:.4rem}.proof span,.metric span,.copy,.section-head p,.card p,.card li{color:var(--muted)}.proof .wide{grid-column:1/-1;padding:1.2rem;background:radial-gradient(circle at 100% 0%, rgba(159,181,255,.12), transparent 28%),radial-gradient(circle at 0% 100%, rgba(215,185,136,.12), transparent 26%),rgba(255,255,255,.05)}.kicker{display:inline-block;margin-bottom:.8rem;padding:.28rem .56rem;border-radius:999px;font-size:.74rem;letter-spacing:.14em;text-transform:uppercase;color:var(--gold);background:rgba(215,185,136,.08);border:1px solid rgba(215,185,136,.16)}section{padding:1rem 0 0}.section-head{display:flex;justify-content:space-between;align-items:end;gap:1rem;margin-bottom:1rem}.section-head h2,.contact h2{margin:0;font-size:clamp(1.7rem,4vw,2.9rem);line-height:1;letter-spacing:-.04em}.section-head p{margin:0;max-width:52ch}.works,.services,.metrics{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1rem}.work{display:flex;flex-direction:column;justify-content:space-between;min-height:320px;background:linear-gradient(180deg,rgba(255,255,255,.07),rgba(255,255,255,.03)),rgba(255,255,255,.04)}.meta{display:flex;flex-wrap:wrap;gap:.5rem}.pill{border:1px solid rgba(255,255,255,.12);color:#d8d0c0;background:rgba(255,255,255,.03);font-size:.77rem;border-radius:999px;padding:.28rem .56rem}.work h3,.services h3,.about h3{margin:.2rem 0 .3rem;font-size:1.15rem;letter-spacing:-.02em}.work h3{font-size:1.45rem;line-height:1.05;letter-spacing:-.04em}.work p{margin:.55rem 0 0}.work .link{display:inline-flex;align-items:center;gap:.4rem;color:#f0e7d6;font-weight:700}.split{display:grid;grid-template-columns:1.05fr .95fr;gap:1rem}.quote{margin:0;font-size:clamp(1.25rem,3vw,2rem);line-height:1.2;letter-spacing:-.04em}.stack{display:grid;gap:.8rem;margin-top:.9rem}.stack .item{padding:.85rem 0;border-top:1px solid rgba(255,255,255,.08)}.stack .item:first-child{padding-top:0;border-top:0}.stack strong{display:block;margin-bottom:.25rem}.metrics{margin-top:1rem;grid-template-columns:repeat(4,minmax(0,1fr));gap:.8rem}.metric{min-height:140px}.contact{margin:1rem 0 3rem;padding:1.4rem;border-radius:30px;background:radial-gradient(circle at 0% 0%, rgba(215,185,136,.12), transparent 25%),radial-gradient(circle at 100% 100%, rgba(159,181,255,.12), transparent 28%),rgba(255,255,255,.05)}.contact-grid{display:grid;grid-template-columns:1fr auto;gap:1rem;align-items:center}.contact p{margin:0;max-width:64ch;color:#ddd7cb}.footer{padding:0 0 2rem;color:var(--muted);font-size:.9rem}.footer .wrap{display:flex;justify-content:space-between;gap:1rem;flex-wrap:wrap;border-top:1px solid rgba(255,255,255,.08);padding-top:1rem}@media (max-width:980px){.hero-grid,.split,.works,.services,.metrics,.contact-grid{grid-template-columns:1fr}.proof{grid-template-columns:1fr 1fr}h1{max-width:12ch}nav{display:none}}@media (max-width:680px){.hero{padding-top:2rem}.proof{grid-template-columns:1fr}.shell{border-radius:24px}.card,.contact{border-radius:22px}.btn{width:100%}.actions{flex-direction:column}}
+</style>
 </head>
 <body>
-  <canvas id="webgl-bg" aria-hidden="true"></canvas>
-  <div class="noise" aria-hidden="true"></div>
+<header class="topbar">
+  <div class="wrap">
+    <div class="brand">
+      <strong>Reinis Kalnaellis</strong>
+      <span>Director · Photographer · Visual Storyteller</span>
+    </div>
+    <nav>
+      <a href="#work">Work</a>
+      <a href="#photography">Photography</a>
+      <a href="#about">About</a>
+      <a href="#services">Services</a>
+      <a href="#contact">Contact</a>
+    </nav>
+  </div>
+</header>
 
-  <main>
-    <header class="hero panel">
-      <p class="eyebrow">Kartupelis TV · WebGL Story Stage</p>
-      <h1 data-reveal data-reveal-start="0.57" data-reveal-end="0.06">Sharp Edge Cinema For Magical Character Worlds</h1>
-      <p class="lead" data-reveal>
-        A deep, cinematic scroll experience where legendary voices enter in stages, giant titles wait for the
-        perfect moment, and WebGL light moves like memory through every paragraph.
-      </p>
-      <div class="stats">
-        <span class="stat">Scroll reactive typography</span>
-        <span class="stat">Realtime shader atmosphere</span>
-        <span class="stat">Character spotlight timeline</span>
-        <span class="stat">Neon myth visual language</span>
+<main>
+  <section class="hero">
+    <div class="wrap shell">
+      <div class="hero-grid">
+        <div>
+          <p class="eyebrow">Riga, Latvia · Film-first visual practice</p>
+          <h1>Director, Photographer &amp; Visual Storyteller</h1>
+          <p class="lead">I create films, photographs, and visual worlds that move between animation, performance, memory, and myth. My work spans animated features, short films, cinematic portraiture, and hybrid image-making designed to stay with people.</p>
+          <div class="actions">
+            <a class="btn primary" href="#contact">Start a collaboration</a>
+            <a class="btn secondary" href="#work">View selected work</a>
+          </div>
+          <p class="hero-note">A clear front door for clients, producers, festivals, artists, and cultural partners looking for distinctive direction and image-making.</p>
+        </div>
+        <div class="proof">
+          <article class="card"><strong>Annecy 2025</strong><span><em>Thelma’s Perfect Birthday</em> screened in Annecy Presents.</span></article>
+          <article class="card"><strong>Berlinale</strong><span><em>Singing Hugo</em> and <em>When Apples Roll</em> appeared in Generation.</span></article>
+          <article class="card"><strong>150+</strong><span>Festival screenings across animated work and short-form storytelling.</span></article>
+          <article class="card"><strong>Feature + Short</strong><span>Experience across feature animation, shorts, visual development, and image-led storytelling.</span></article>
+          <article class="card wide"><span class="kicker">Current positioning</span><strong style="font-size:1.8rem;margin-bottom:.55rem">Film credibility. Cinematic image-making. A recognisable artistic voice.</strong><span>This site is the central point of entry for directing work, photography commissions, visual development, and collaborations that benefit from a filmmaker’s eye.</span></article>
+        </div>
       </div>
-    </header>
+    </div>
+  </section>
 
-    <section class="story">
-      <article class="column panel">
-        <h2 data-reveal data-reveal-start="0.68" data-reveal-end="0.15">The Reflecting Characters</h2>
-        <p class="note" data-reveal>
-          Characters now speak with the cadence of major cinema: quotes from movie stars, directors, and producers
-          are arranged as emotional waypoints. The typography appears later on scroll, giving each line a grand entrance.
-        </p>
-
-        <div class="characters">
-          <div class="character" data-reveal>
-            <strong>THE STAR</strong>
-            <p>"If you can dream it, you can do it." — Walt Disney</p>
+  <section id="work">
+    <div class="wrap">
+      <div class="section-head">
+        <h2>Selected work</h2>
+        <p>A curated entry point into internationally visible projects, spanning feature animation and short-form work with strong festival presence.</p>
+      </div>
+      <div class="works">
+        <article class="card work">
+          <div>
+            <div class="meta"><span class="pill">Feature animation</span><span class="pill">2024 / 2025</span></div>
+            <h3>Thelma’s Perfect Birthday</h3>
+            <p>A Latvian-Luxembourg co-production directed by Reinis Kalnaellis. The film premiered at Schlingel and later screened in Annecy Presents, bringing a warm, handmade visual world to an international audience.</p>
           </div>
-          <div class="character" data-reveal>
-            <strong>THE DIRECTOR</strong>
-            <p>"The most honest form of filmmaking is to make a film for yourself." — Peter Jackson</p>
+          <a class="link" href="https://www.nkc.gov.lv/en/thelmas-perfect-birthday" target="_blank" rel="noreferrer">Open official film page ↗</a>
+        </article>
+        <article class="card work">
+          <div>
+            <div class="meta"><span class="pill">Short animation</span><span class="pill">Berlinale 2017</span></div>
+            <h3>Singing Hugo and His Incredible Adventures</h3>
+            <p>A playful, dialogue-free short selected for Berlinale Generation Kplus. Fast, expressive storytelling with musical timing and strong character energy.</p>
           </div>
-          <div class="character" data-reveal>
-            <strong>THE PRODUCER</strong>
-            <p>"Luck is what you have left over after you give 100 percent." — Langston Coleman</p>
+          <a class="link" href="https://www.berlinale.de/en/2017/programme/201715671.html" target="_blank" rel="noreferrer">View Berlinale listing ↗</a>
+        </article>
+        <article class="card work">
+          <div>
+            <div class="meta"><span class="pill">Debut short</span><span class="pill">Berlinale 2009</span></div>
+            <h3>When Apples Roll</h3>
+            <p>The early short that introduced Kalnaellis internationally and helped establish a long-running festival trajectory rooted in atmosphere, humour, and precise visual rhythm.</p>
           </div>
-        </div>
-
-        <figure class="frame">
-          <img src="custom/textures/rija_ny2026.jpg" alt="Cinematic city glow reflecting across wet streets" />
-          <figcaption>Riga midnight signal — the visual tone behind the new experience.</figcaption>
-        </figure>
-      </article>
-
-      <aside class="column panel">
-        <h2 data-reveal data-reveal-start="0.7" data-reveal-end="0.17">Dynamic Scroll Reveal</h2>
-        <p class="note" data-reveal>
-          The scene unfolds like a keynote in motion: headers hold back until the reader dives deeper,
-          then spark into view with glowing letter trails and interleaved rhythm.
-        </p>
-
-        <div class="scroll-track">
-          <p class="quote-line" data-reveal>"Great stories happen to those who can tell them." — Ira Glass</p>
-          <p class="quote-line" data-reveal>"Movies touch our hearts and awaken our vision." — Martin Scorsese</p>
-          <p class="quote-line" data-reveal>"Success is not final, failure is not fatal: it is the courage to continue that counts." — Winston Churchill</p>
-        </div>
-      </aside>
-    </section>
-
-    <section class="mode4">
-      <article class="mode4-intro panel">
-        <h2 data-reveal data-reveal-start="0.74" data-reveal-end="0.21">Mode 4 · Interleaved Blog Headers</h2>
-        <p class="note" data-reveal>
-          This new mode introduces four bold blog chapters. Each oversized title is delayed so it lands later in
-          the scroll journey, creating a dramatic staggered cadence across the page.
-        </p>
-      </article>
-
-      <div class="mode-grid">
-        <article class="mode-blog panel">
-          <p class="eyebrow">Blog 01 · Star Voice</p>
-          <h3 data-reveal data-reveal-start="0.8" data-reveal-end="0.28">Act With Fire, Speak With Light</h3>
-          <p class="note" data-reveal>"The best way to predict the future is to create it." — often shared by cinematic producers shaping new eras.</p>
-        </article>
-        <article class="mode-blog panel">
-          <p class="eyebrow">Blog 02 · Director Lens</p>
-          <h3 data-reveal data-reveal-start="0.82" data-reveal-end="0.3">Direct Every Frame Like A Promise</h3>
-          <p class="note" data-reveal>"Cinema is a matter of what's in the frame and what's out." — Martin Scorsese</p>
-        </article>
-        <article class="mode-blog panel">
-          <p class="eyebrow">Blog 03 · Producer Pulse</p>
-          <h3 data-reveal data-reveal-start="0.8" data-reveal-end="0.29">Produce Courage Before You Produce Scale</h3>
-          <p class="note" data-reveal>"The secret to getting ahead is getting started." — Mark Twain, embraced by generations of filmmakers.</p>
-        </article>
-        <article class="mode-blog panel">
-          <p class="eyebrow">Blog 04 · Legacy Craft</p>
-          <h3 data-reveal data-reveal-start="0.84" data-reveal-end="0.31">Build Beauty Through WebGL Motion</h3>
-          <p class="note" data-reveal>"People will forget what you said, people will never forget how you made them feel." — Maya Angelou</p>
+          <a class="link" href="https://www.berlinale.de/en/2009/programme/20092565.html" target="_blank" rel="noreferrer">View Berlinale archive ↗</a>
         </article>
       </div>
-    </section>
+    </div>
+  </section>
 
-    <footer class="panel">
-      <span>© 2026 Kartupelis TV · redesigned into a magical sharp-edge scroll experience.</span>
-      <span>Built with HTML, CSS, Three.js shader background, and dynamic letter reveal scripting.</span>
-    </footer>
-  </main>
+  <section id="photography">
+    <div class="wrap split">
+      <article class="card about">
+        <p class="eyebrow">Photography</p>
+        <h2 style="margin:0;font-size:clamp(1.8rem,4vw,3.1rem);line-height:1;letter-spacing:-.05em">Cinematic images for artists, performances, and places</h2>
+        <p class="copy">My photography sits between documentary and dream. I am drawn to performers, spaces, weather, rituals, and moments where reality starts to feel staged by memory. The result is not standard coverage, but atmosphere with emotional weight.</p>
+        <div class="stack">
+          <div class="item"><strong>Best suited for</strong><span>Musicians, performers, actors, directors, festivals, theatres, artist portraits, and culture-led visual campaigns.</span></div>
+          <div class="item"><strong>Visual signature</strong><span>Layered, intimate, slightly unreal, with a filmmaker’s sense of timing, gesture, and emotional framing.</span></div>
+          <div class="item"><strong>Why it connects</strong><span>Clients who want more than a polished image usually want a mood, a world, and a point of view. That is where this work lives.</span></div>
+        </div>
+      </article>
+      <article class="card">
+        <p class="eyebrow">Approach</p>
+        <p class="quote">“I turn real moments into cinematic memory.”</p>
+        <p class="copy">The same sensibility runs through the film work and the still images: character first, atmosphere always, and form in service of feeling. Whether the medium is animation, hybrid storytelling, or photography, the aim is the same: make the image stay alive after the viewer leaves.</p>
+        <div class="metrics">
+          <article class="card metric"><strong>Riga</strong><span>Based in Latvia and working internationally.</span></article>
+          <article class="card metric"><strong>Tallinn</strong><span>Film and media studies grounding.</span></article>
+          <article class="card metric"><strong>Prague</strong><span>Further training through FAMU-linked study.</span></article>
+          <article class="card metric"><strong>Cross-medium</strong><span>Animation, photography, concepting, visual worlds.</span></article>
+        </div>
+      </article>
+    </div>
+  </section>
 
-  <script src="https://cdn.jsdelivr.net/npm/three@0.161.0/build/three.min.js"></script>
-  <script>
-    (() => {
-      const splitReveal = (el) => {
-        if (!el || el.dataset.splitDone) return;
-        const text = el.textContent;
-        el.textContent = '';
-        const wrapper = document.createElement('span');
-        wrapper.className = 'reveal';
+  <section id="about">
+    <div class="wrap">
+      <div class="section-head">
+        <h2>About</h2>
+        <p>Reinis Kalnaellis is a Latvian director, photographer, and visual storyteller based in Riga. His public body of work is strongest in animation, while his broader practice also extends into photographic series, hybrid visual development, and author-led world-building.</p>
+      </div>
+      <div class="split">
+        <article class="card about">
+          <h3>Professional identity</h3>
+          <p>Film-first, image-led, and multidisciplinary without becoming diffuse. This front page is designed to make that immediately legible: an experienced director with festival credibility, an emerging photographic voice with a strong point of view, and a collaborator who can shape projects from concept to emotionally resonant image.</p>
+          <div class="stack">
+            <div class="item"><strong>What I bring</strong><span>Direction, visual storytelling, atmosphere, character sense, concept development, and the ability to connect handcrafted emotion with contemporary tools.</span></div>
+            <div class="item"><strong>What I care about</strong><span>Images that feel lived in, memorable, and honest. Work that can move between children’s worlds, poetic documentary sensibility, and more mature mythic or surreal territory.</span></div>
+          </div>
+        </article>
+        <article class="card about">
+          <h3>Best fit collaborations</h3>
+          <p>Producers seeking a director with a distinct visual voice. Artists who want cinematic portraiture or campaign imagery. Cultural spaces, festivals, theatres, and cross-media projects that benefit from a filmmaker’s approach to tone and narrative.</p>
+          <div class="stack">
+            <div class="item"><strong>Ideal clients</strong><span>Production companies, artists, labels, festivals, institutions, boutique brands, and creative teams that want a world, not just content.</span></div>
+            <div class="item"><strong>Working style</strong><span>Thoughtful, visually exacting, fast in idea generation, and comfortable moving between high-level vision and practical execution.</span></div>
+          </div>
+        </article>
+      </div>
+    </div>
+  </section>
 
-        [...text].forEach((char, i) => {
-          const span = document.createElement('span');
-          span.className = 'reveal-char';
-          span.textContent = char === ' ' ? '\u00A0' : char;
-          span.style.setProperty('--index', i);
-          span.style.setProperty('--lit', '0');
-          wrapper.appendChild(span);
-        });
+  <section id="services">
+    <div class="wrap">
+      <div class="section-head">
+        <h2>Services &amp; collaborations</h2>
+        <p>A simple way to understand what can be commissioned right now, without making anyone decode a whole artistic cosmology before sending an email.</p>
+      </div>
+      <div class="services">
+        <article class="card"><h3>Direction</h3><p>Feature and short-form development, animation direction, visual concepting, story development, and director-led creative collaboration from early treatment to finished work.</p></article>
+        <article class="card"><h3>Photography</h3><p>Cinematic artist portraits, live performance sessions, editorial-feeling imagery, atmospheric stills, and visual campaigns for musicians, actors, festivals, and cultural spaces.</p></article>
+        <article class="card"><h3>Visual development</h3><p>Mood worlds, presentation language, concept framing, hybrid story experiments, and image systems that help projects feel distinctive before they are fully built.</p></article>
+      </div>
+    </div>
+  </section>
 
-        el.appendChild(wrapper);
-        el.dataset.splitDone = 'true';
-      };
+  <section id="contact">
+    <div class="wrap">
+      <div class="contact">
+        <div class="contact-grid">
+          <div>
+            <h2>Let’s make something unforgettable.</h2>
+            <p>For directing work, photography commissions, visual development, festival invitations, or artist collaborations, the cleanest first step is a direct inquiry. Business correspondence is currently handled via RIJA Films.</p>
+          </div>
+          <div class="actions" style="margin-top:0">
+            <a class="btn primary" href="mailto:info@rijafilms.lv?subject=Collaboration%20for%20Reinis%20Kalnaellis">Email for inquiries</a>
+            <a class="btn secondary" href="https://www.rijafilms.com/" target="_blank" rel="noreferrer">RIJA Films ↗</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
 
-      const revealBlocks = [...document.querySelectorAll('[data-reveal]')];
-      revealBlocks.forEach(splitReveal);
-
-      const updateRevealProgress = () => {
-        const vh = window.innerHeight;
-        revealBlocks.forEach((block) => {
-          const rect = block.getBoundingClientRect();
-          const start = vh * Number(block.dataset.revealStart || 0.85);
-          const end = vh * Number(block.dataset.revealEnd || 0.2);
-          const progress = Math.max(0, Math.min(1, (start - rect.top) / (start - end)));
-          const chars = block.querySelectorAll('.reveal-char');
-          const litCount = progress * chars.length;
-
-          chars.forEach((char, index) => {
-            const lit = Math.max(0, Math.min(1, litCount - index));
-            char.style.setProperty('--lit', lit.toFixed(3));
-          });
-        });
-      };
-
-      updateRevealProgress();
-      window.addEventListener('scroll', updateRevealProgress, { passive: true });
-      window.addEventListener('resize', updateRevealProgress);
-
-      if (!window.THREE || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-
-      const canvas = document.getElementById('webgl-bg');
-      const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
-      const scene = new THREE.Scene();
-      const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
-
-      const uniforms = {
-        uTime: { value: 0 },
-        uScroll: { value: 0 },
-        uRes: { value: new THREE.Vector2(window.innerWidth, window.innerHeight) }
-      };
-
-      const material = new THREE.ShaderMaterial({
-        transparent: true,
-        uniforms,
-        vertexShader: `
-          varying vec2 vUv;
-          void main() {
-            vUv = uv;
-            gl_Position = vec4(position, 1.0);
-          }
-        `,
-        fragmentShader: `
-          precision highp float;
-          varying vec2 vUv;
-          uniform float uTime;
-          uniform float uScroll;
-
-          float hash(vec2 p){ return fract(sin(dot(p, vec2(21.31, 47.17))) * 43758.5453); }
-          float noise(vec2 p){
-            vec2 i = floor(p);
-            vec2 f = fract(p);
-            vec2 u = f * f * (3.0 - 2.0 * f);
-            return mix(mix(hash(i), hash(i + vec2(1.,0.)), u.x), mix(hash(i + vec2(0.,1.)), hash(i + vec2(1.,1.)), u.x), u.y);
-          }
-
-          void main() {
-            vec2 uv = vUv;
-            float t = uTime * 0.18;
-            float wave = sin((uv.y + uScroll * 0.35) * 15.0 + t * 8.0) * 0.018;
-            uv.x += wave;
-            float layer1 = noise(uv * 4.8 + vec2(t, -t * 0.8));
-            float layer2 = noise(uv * 17.0 - vec2(t * 1.3, t * 0.4));
-            float strip = smoothstep(0.86, 1.0, noise(vec2(uv.y * 140.0, t * 0.9)));
-
-            vec3 color = mix(vec3(0.03, 0.04, 0.13), vec3(0.05, 0.13, 0.24), layer1);
-            color += vec3(0.4, 0.2, 0.7) * layer2 * 0.22;
-            color += vec3(0.2, 0.9, 1.0) * strip * 0.1;
-            color *= smoothstep(1.0, 0.15, distance(vUv, vec2(0.48, 0.45)));
-
-            gl_FragColor = vec4(color, 0.9);
-          }
-        `
-      });
-
-      scene.add(new THREE.Mesh(new THREE.PlaneGeometry(2, 2), material));
-
-      const resize = () => {
-        renderer.setSize(window.innerWidth, window.innerHeight, false);
-        uniforms.uRes.value.set(window.innerWidth, window.innerHeight);
-      };
-
-      resize();
-      window.addEventListener('resize', resize);
-
-      const onScroll = () => {
-        const max = Math.max(1, document.body.scrollHeight - window.innerHeight);
-        uniforms.uScroll.value = window.scrollY / max;
-      };
-
-      onScroll();
-      window.addEventListener('scroll', onScroll, { passive: true });
-
-      const tick = (time) => {
-        uniforms.uTime.value = time * 0.001;
-        renderer.render(scene, camera);
-        requestAnimationFrame(tick);
-      };
-
-      requestAnimationFrame(tick);
-    })();
-  </script>
+<footer class="footer">
+  <div class="wrap">
+    <span>© <span id="year"></span> Reinis Kalnaellis</span>
+    <span>Director · Photographer · Visual Storyteller</span>
+  </div>
+</footer>
+<script>document.getElementById('year').textContent=new Date().getFullYear()</script>
 </body>
 </html>

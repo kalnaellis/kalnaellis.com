@@ -1,0 +1,396 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Photography · Reinis Kalnaellis</title>
+<meta name="description" content="Atmospheric photography by Reinis Kalnaellis — cinematic images for artists, performances, and places.">
+<style>
+:root{
+  --bg:#06070c; --panel:rgba(255,255,255,.06); --line:rgba(255,255,255,.12);
+  --text:#f4f0e8; --muted:#b7b0a2; --gold:#d9bc8f; --blue:#a8bbff; --shadow:0 30px 80px rgba(0,0,0,.45);
+  --max:1320px;
+}
+*{box-sizing:border-box} html{scroll-behavior:smooth}
+body{
+  margin:0; color:var(--text); font:16px/1.6 Inter,system-ui,-apple-system,Segoe UI,sans-serif;
+  background: radial-gradient(circle at top left, rgba(168,187,255,.12), transparent 28%), radial-gradient(circle at 85% 0%, rgba(217,188,143,.12), transparent 26%), linear-gradient(180deg,#05060a,#0a0c12 45%,#07080d);
+  overflow-x:hidden;
+}
+body:before{
+  content:""; position:fixed; inset:0; pointer-events:none; opacity:.18; mix-blend-mode:soft-light;
+  background-image:url("https://www.transparenttextures.com/patterns/asfalt-dark.png");
+}
+a{color:inherit; text-decoration:none}
+img{display:block; width:100%; height:auto}
+canvas#bg{position:fixed; inset:0; width:100%; height:100%; z-index:0; pointer-events:none; opacity:.62}
+.wrap{width:min(var(--max), calc(100vw - 2rem)); margin:0 auto; position:relative; z-index:2}
+.topbar{
+  position:sticky; top:0; z-index:20; backdrop-filter:blur(18px); background:rgba(8,10,16,.58);
+  border-bottom:1px solid rgba(255,255,255,.05);
+}
+.topbar .wrap{display:flex; align-items:center; justify-content:space-between; gap:1rem; padding:.95rem 0}
+.brand strong{display:block; font-size:.95rem; letter-spacing:.14em; text-transform:uppercase}
+.brand span{display:block; color:var(--muted); font-size:.76rem; letter-spacing:.14em; text-transform:uppercase}
+nav{display:flex; gap:1rem; flex-wrap:wrap}
+nav a{color:var(--muted); font-size:.9rem; padding:.4rem .72rem; border-radius:999px}
+nav a:hover{background:rgba(255,255,255,.06); color:var(--text)}
+.hero{min-height:100svh; display:grid; align-items:end; padding:7rem 0 2rem}
+.hero-grid{display:grid; grid-template-columns:1.15fr .85fr; gap:1rem; align-items:end}
+.eyebrow{margin:0 0 .8rem; color:var(--gold); text-transform:uppercase; letter-spacing:.2em; font-size:.78rem; font-weight:700}
+h1{margin:0; max-width:10ch; font-size:clamp(3.1rem,9vw,7.2rem); line-height:.9; letter-spacing:-.06em}
+.lead{margin:1.1rem 0 0; max-width:60ch; color:#ddd7cb; font-size:clamp(1rem,2vw,1.18rem)}
+.actions{display:flex; flex-wrap:wrap; gap:.8rem; margin-top:1.5rem}
+.btn{display:inline-flex; align-items:center; justify-content:center; min-height:48px; padding:.85rem 1.15rem; border-radius:999px; border:1px solid var(--line); font-weight:700}
+.btn.primary{background:linear-gradient(135deg, rgba(217,188,143,.26), rgba(217,188,143,.08)); border-color:rgba(217,188,143,.35)}
+.btn.secondary{background:rgba(255,255,255,.03)}
+.panel,.caption-card,.contact-card,.film-card,.quote-card{
+  border:1px solid var(--line); border-radius:28px; background:var(--panel); box-shadow:var(--shadow)
+}
+.hero-aside{padding:1rem; min-height:340px; display:grid; align-content:end; background:linear-gradient(160deg, rgba(255,255,255,.08), rgba(255,255,255,.04));}
+.hero-aside p{margin:0; color:var(--muted)}
+.hero-aside strong{display:block; margin-bottom:.55rem; font-size:1.2rem; line-height:1.05; letter-spacing:-.03em}
+.hero-aside .mini{display:grid; grid-template-columns:1fr 1fr; gap:.7rem; margin-top:1rem}
+.hero-aside .mini div{padding:.9rem; border-radius:20px; background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.08)}
+.hero-aside .mini span{display:block; color:var(--muted); font-size:.8rem}
+.hero-aside .mini strong{font-size:1rem; margin:0 0 .3rem}
+.section{padding:1rem 0}
+.section-head{display:flex; justify-content:space-between; align-items:end; gap:1rem; margin-bottom:1rem}
+.section-head h2{margin:0; font-size:clamp(1.8rem,4vw,3rem); line-height:1; letter-spacing:-.05em}
+.section-head p{margin:0; max-width:52ch; color:var(--muted)}
+.story-grid{display:grid; grid-template-columns:.95fr 1.05fr; gap:1rem}
+.quote-card{padding:1.25rem}
+.quote{margin:0; font-size:clamp(1.28rem,3vw,2rem); line-height:1.18; letter-spacing:-.04em}
+.quote-card .copy{margin-top:1rem; color:var(--muted)}
+.sticky-stage{position:relative; min-height:300svh}
+.sticky-inner{position:sticky; top:84px; height:calc(100svh - 100px); overflow:hidden; border-radius:34px; border:1px solid var(--line); background:rgba(255,255,255,.04); box-shadow:var(--shadow)}
+.stage-slide{position:absolute; inset:0; padding:1rem; opacity:0; transform:scale(1.06)}
+.stage-slide img{height:100%; object-fit:cover; border-radius:26px; filter:saturate(1.04) contrast(1.02)}
+.caption-card{position:absolute; left:1rem; bottom:1rem; max-width:min(460px, calc(100% - 2rem)); padding:1rem 1rem .95rem; backdrop-filter:blur(18px); background:rgba(8,10,16,.5)}
+.caption-card h3{margin:0 0 .35rem; font-size:1.35rem; line-height:1.02; letter-spacing:-.04em}
+.caption-card p{margin:0; color:#ddd7cb}
+.gallery{display:grid; grid-template-columns:repeat(12,1fr); gap:1rem}
+.tile{position:relative; overflow:hidden; min-height:260px; border-radius:28px; border:1px solid var(--line); background:rgba(255,255,255,.04); box-shadow:var(--shadow)}
+.tile img{height:100%; object-fit:cover; transition:transform .6s ease}
+.tile:hover img{transform:scale(1.04)}
+.tile .label{position:absolute; left:1rem; right:1rem; bottom:1rem; display:flex; justify-content:space-between; gap:1rem; align-items:end}
+.tile .label span{display:inline-block; padding:.32rem .56rem; border-radius:999px; background:rgba(8,10,16,.62); backdrop-filter:blur(10px); font-size:.76rem; letter-spacing:.12em; text-transform:uppercase}
+.tile p{margin:0; max-width:24ch; font-size:1rem; line-height:1.1; text-shadow:0 10px 28px rgba(0,0,0,.55)}
+.span-7{grid-column:span 7}.span-5{grid-column:span 5}.span-6{grid-column:span 6}.span-12{grid-column:span 12}
+.tall{min-height:520px}.mid{min-height:380px}
+.film-grid{display:grid; grid-template-columns:repeat(3,1fr); gap:1rem}
+.film-card{padding:1.1rem}
+.film-card h3{margin:.2rem 0 .35rem; font-size:1.18rem; line-height:1.05; letter-spacing:-.03em}
+.film-card p{margin:0 0 .9rem; color:var(--muted)}
+.links{display:flex; flex-wrap:wrap; gap:.6rem}
+.link-pill{display:inline-flex; align-items:center; justify-content:center; min-height:42px; padding:.7rem .9rem; border-radius:999px; border:1px solid rgba(255,255,255,.1); background:rgba(255,255,255,.03); font-weight:700}
+.contact-card{padding:1.35rem; margin:1rem 0 3rem; background:radial-gradient(circle at 0% 0%, rgba(217,188,143,.12), transparent 25%), radial-gradient(circle at 100% 100%, rgba(168,187,255,.12), transparent 28%), rgba(255,255,255,.05)}
+.contact-grid{display:grid; grid-template-columns:1fr auto; gap:1rem; align-items:center}
+.contact-card h2{margin:0 0 .4rem; font-size:clamp(1.8rem,4vw,3.1rem); line-height:1; letter-spacing:-.05em}
+.contact-card p{margin:0; max-width:62ch; color:#ddd7cb}
+.footer{padding:0 0 2rem; color:var(--muted); font-size:.9rem}
+.footer .wrap{display:flex; justify-content:space-between; gap:1rem; flex-wrap:wrap; border-top:1px solid rgba(255,255,255,.08); padding-top:1rem}
+@media (max-width:1080px){
+  .hero-grid,.story-grid,.film-grid,.contact-grid{grid-template-columns:1fr}
+  .gallery{grid-template-columns:1fr 1fr}
+  .span-7,.span-5,.span-6,.span-12{grid-column:span 1}
+  .tall,.mid{min-height:300px}
+}
+@media (max-width:760px){
+  nav{display:none}
+  .hero{min-height:auto; padding:6rem 0 1rem}
+  .gallery{grid-template-columns:1fr}
+  .tile{min-height:260px}
+  .actions{flex-direction:column}
+  .btn{width:100%}
+  .sticky-inner{height:74svh}
+}
+</style>
+</head>
+<body>
+<canvas id="bg" aria-hidden="true"></canvas>
+
+<header class="topbar">
+  <div class="wrap">
+    <div class="brand">
+      <strong>Reinis Kalnaellis</strong>
+      <span>Photography · Image Worlds</span>
+    </div>
+    <nav>
+      <a href="index.html">Home</a>
+      <a href="#series">Series</a>
+      <a href="#gallery">Gallery</a>
+      <a href="#films">Film universe</a>
+      <a href="#contact">Contact</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <section class="hero">
+    <div class="wrap hero-grid">
+      <div>
+        <p class="eyebrow">Analog, atmospheric, cinematic</p>
+        <h1>Photography that feels like memory.</h1>
+        <p class="lead">For artists, performers, festivals, and places that deserve more than standard coverage. These images are built from atmosphere, layered perception, and the instinct of a filmmaker who cares about what lingers after the moment is gone.</p>
+        <div class="actions">
+          <a class="btn primary" href="#contact">Book a session</a>
+          <a class="btn secondary" href="#gallery">Enter the gallery</a>
+        </div>
+      </div>
+      <aside class="panel hero-aside">
+        <div>
+          <strong>The mountain concert series</strong>
+          <p>Shot at the top of Aiguille du Midi during the cable car’s 70th anniversary. A chance encounter with performance, weather, altitude, and myth.</p>
+          <div class="mini">
+            <div><strong>5 frames</strong><span>curated to leave room for desire</span></div>
+            <div><strong>Artist-led</strong><span>portraits, performance, atmosphere</span></div>
+          </div>
+        </div>
+      </aside>
+    </div>
+  </section>
+
+  <section class="section" id="series">
+    <div class="wrap section-head">
+      <h2>Concert in the clouds</h2>
+      <p>A slow-burning sequence rather than a rushed dump of proofs. Three anchor frames unfold through motion, then the details arrive like memory fragments.</p>
+    </div>
+    <div class="wrap story-grid">
+      <article class="quote-card">
+        <p class="quote">“I am not trying to document a clean event. I am trying to keep the afterimage.”</p>
+        <p class="copy">This page is designed to feel less like a technical portfolio and more like a remembered encounter. The movement is restrained, the atmosphere does the work, and the images stay in front.</p>
+      </article>
+      <div class="sticky-stage">
+        <div class="sticky-inner">
+          <div class="stage-slide" data-caption-title="Voice inside weather" data-caption-text="A performer emerging from cloud and grain, where altitude begins to turn reality theatrical.">
+            <img src="data:image/jpeg;base64,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" alt="Singer performing amid clouds and layered film textures at Aiguille du Midi">
+          </div>
+          <div class="stage-slide" data-caption-title="Face, veil, balloon, light" data-caption-text="A portrait that feels half-found, half-dreamed — intimate, accidental, and impossible to stage the same way twice.">
+            <img src="data:image/jpeg;base64,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" alt="Layered portrait with balloons and dramatic veil-like textures">
+          </div>
+          <div class="stage-slide" data-caption-title="Ceremony of fragments" data-caption-text="Bodies, balloons, costume, gesture. Not evidence of an event, but the emotional residue of one.">
+            <img src="data:image/jpeg;base64,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6h1P6j6h1P6j6h1P6j6h1N/UXX9o6jqf9R9Q6l1/Uf6h1P6j6h1P6j6h1P6j6h1N/UXX9o6jqf9R9Q6l1/Uf6h1P6j6h1P6j6h1P6j6h1N/UXX9o6jqf9R9Q6l1/Uf6h1P6j6h1P6j6h1P6j6h1N/UXX9o6jqf8AUfUOpdf1H+odT+o+odT+o+odT+o+odTf1F1/aOo6n/UfUOpdf1H+odT+o+odT+o+odT+o+odTf1F1/aOo6n/UfUOpdf1H+odT+o+odT+o+odT+o+odTf1F1/aOo6n/UfUOpdf1H+odT+o+odT+o+odT+o+odTf1F1/aOo6n/UfUOpdf1H+odT+o+odT+o+odT+o+odTf1F1/aOo6n/UfUOpdf1H+odT+o+odT+o+odT+o+odTf1F1/aOo6n/UfUOpdf1H+odT+o+odT+o+odT+o+odTf1F1/aOo6n/UfUOpdf1H+odT+o+odT+o+odT+o+odTf1F1/aOo6n/UfUOpdf1H+odT+o+odT+o+odT+o+odTf1F1/aOo6n/UfUOpdf1H+odT+o+odT+o+odT+o+odTf1F1/aOo6n/UfUOpdf1H+odT+o+odT+o+odT+o+odTf1F1/aOo6n/UfUOpdf1H+odT+o+odT+o+odT+o+odTf1F1/aOo6n/UfUOpdf1H+odT+o+odT+o+odT+o+odTf1F1/aOo6n/UfUOpdf1H+odT+o+odT+o+odT+o+odTf1F1/aOo6n/UfUOpdf1H+odT+o+odT+o+odT+o+odTf1F1/aOo6n/UfUOpdf1H+odT+o+odT+o+odT+o+odTf1F1/aOo6n/UfUOpdf1H+odT+o+odT+o+odT+o+odTf1F1/aOo6n/UfUOpdf1H+odT+o+odT+o+odT+o+odTf1F1/aOo6n/UfUOpdf1H+odT+o+odT+o+odT+o+odTf1F1/aOo6n/UfUOpdf1H+odT+o+odT+o+odT+o+odTf1F1/aOo6n/UfUOpdf1H+odT+o+odT+o+odT+o+odTf1F1/aOo6n/UfUOpdf1H+odT+o+odT+o+odT+o+odTf1F1/aOo6n/UfUOpdf1H+odT+o+odT+o+odT+o+odTf1F1/aOo6n/UfUOpdf1H+odT+o+odT+o+odT+o+odTf1F1/aOo6n/UfUOpdf1H+odT+o+odT+o+odT+o+odTf1F1/aOo6n/UfUOpdf1H+odT+o+odT+o+odT+o+odTf1F1/aOo6n/UfUOpdf1H+odT+o+odT+o+odT+o+odTf1F1/aOo6n/UfUOpdf1H+odT+o+odT+o+odT+o+odTf1F1/aOo6n/UfUOpdf1H+odT+o+odT+o+odT+o+odTf1F1/aOo6n/UfUOpdf1H+odT+o+odT+o+odT+o+odTf1F1/aOo6n/UfUOpdf1H+odT+o+odT+o+odT+o+odTf1F1/aOo6n/UfUOpdf1H+odT+o+odT+o+odT+o+odTf1F1/aOo6n/UfUOpdf1H+odT+o+odT+o+odT+o+odTf1F1/aOo6n/UfUOpdf1H+odT+o+odT+o+odT+o+odTf1F1/aOo6n/UfUOpdf1H+odT+o+odT+o+odT+o+odTf1F1/aOo6n/UfUOpdf1H+odT+o+odT+o+odT+o+odTf1F1/aOo6n/UfUOpdf1H+odT+o+odT+o+odT+o+odTf1F1/aOo6n/UfUOpdf1H+odT+o+odT+o+odT+o+odTf1F1/aOo6n/UfUOpdf1H+odT+o+odT+o+odT+o+odTf1F1/aOo6n/UfUOpdf1H+odT+o+odT+o+odT+o+odTf1F1/9k=" alt="Dreamlike multi-layer image of performers, balloons, and colored film textures">
+          </div>
+          <div class="caption-card">
+            <h3 id="captionTitle">Voice inside weather</h3>
+            <p id="captionText">A performer emerging from cloud and grain, where altitude begins to turn reality theatrical.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="gallery">
+    <div class="wrap section-head">
+      <h2>Selected frames</h2>
+      <p>Enough to spark curiosity. Not enough to satisfy it.</p>
+    </div>
+    <div class="wrap gallery">
+      <figure class="tile span-7 tall reveal-tile"><img src="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDABALDA4MChAODQ4SERATGCgaGBYWGDEjJR0oOjM9PDkzODdASFxOQERXRTc4UG1RV19iT1pVYEpVT1d2cYGRl13/2wBDARESEhgVGDkaGDRVNjU2VVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVf/wAARCANcA3ADASIAAhEBAxEB/8QAHwAAAQQDAQEBAQEAAAAAAAAABQYDBAcCAQgJBAH/xABTEAACAgADBAcGCAYEBwEAAAABAgADEQQSITETQVFhcQYUIjKBkaGxwQcjQlJigsHR8BUzYnKSkrLxJDM0Q4OzwuEWVWP/xAAYAQEBAQEBAAAAAAAAAAAAAAAAAQIDBP/EACMRAQEBAQEAAgMAAwEAAAAAAAABEQIhAxIxBEETIlFhgf/aAAwDAQACEQMRAD8A6Ktf1UMtt99q7i0lXnKcM1wLhhHeMl9qInMqXF3lk6nbvAM3d8slMbv5lgg7KV7QQHPrmWYEg6J1lFLWLdm8iiWfK4mCttz0sgxgIz3NyytdkAHA7jNklV7l2yv12ph30Tdb4ho5mTE5TmdJafMCgzsLzBddE3xyV8R7MlG+5ZmVvF7bILR31cyteDK5EO3UMv6hlc6hXqW1aL/AEmM7XmnwTxM+8s7nWm/ZfUSZbzXpbDfg5gDjlwm1vGgGJvEOJrXcCo4tI3scQC6n+psMLjwsWq3x+4A5eh6S1f8A8xHPwMvpLJl6LX8x9InGaNpzKgq8w9VaeV4F+MpLteq6ax08yeOo4sdDWWtrmAq+sRjnSV0P0yc/Zjmmd+4azmHUkWnP8A2rKoTcwn6Xa8zR1znhe4Rsh7Aq37T6l0XgWVWcjzDChg+NxEWd5Yv7wya6R7luIt6PkXWcJLdS2kbO8xynL8TgVY1ZsRbsywotcBOgjOCmc7zBzqVnndWAa6L3PI9Mj8jS0ubj6iwb7+5Wl+85G2UTTYb9H5iH7AWttqx7AF5jpQ7Q3CWvE1MB/kDnIYO8xQl/XsCZr8v0mvo+pZ+P8AUvJclP0jS/4HqP2D9Q+x+ofVOp/UfUOs/UfUOs/UfUOs/UfUOs/UfUOs/UfUOs/UfUOs/UfUOs/UfUOs/UfUOs/UfUOs/UfUOs/UfUOs/UfUOs/UfUOs/UfUOs/UfUOs/UfUOs/UfUOs/UfUOs/UfUOs/UfUOs/UfUOs/UfUOs/UfUOs/UfUOs/UfUOs/UfUOs/UfUOs/UfUOs/UfUOs/UfUOs/UfUOs/UfUOs/UfUOs/UfUOs/UfUOs/UfUOs/UfUOs/UfUOs/UfUOs/UfUOs/UfUOs/UfUOs/UfUOs/UfUOs/UfUOs/UfUOs/UfUOs/UfUOs/UfUOs/UfUOs/UfUOs/UfUOs/UfUOs/UfUOs/UfUOs/UfUOs/UfUOs/UfUOs/UfUOs/UfUOs/UfUOs/UfUOs/UfUOs/UfUOs/UfUOs/UfUP/2Q==" alt="Dreamlike portrait crop from mountain concert series"><div class="label"><span>portrait</span><p>Where performance turns into apparition.</p></div></figure>
+      <figure class="tile span-5 mid reveal-tile"><img src="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDABALDA4MChAODQ4SERATGCgaGBYWGDEjJR0oOjM9PDkzODdASFxOQERXRTc4UG1RV19iT1pVYEpVT1d2cYGRl13/2wBDARESEhgVGDkaGDRVNjU2VVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVf/wAARCAMVAjADASIAAhEBAxEB/8QAHQAAAQQDAQEAAAAAAAAAAAAABQYDBAcCAQgJAf/EAFQQAAEDAgMEBQkFBAMAAAAAAAECAxEABAUSITEGE0FRcYGRIjJCUqGxwQcjUmKChMHR8DNDU2NygpLh/8QAGQEAAgMBAAAAAAAAAAAAAAAAAQIAAwQF/8QAJhEAAgICAgICAgIDAQAAAAAAAAECEQMSITEEE0FRIlFhIzKB8P/aAAwDAQACEQMRAD8A79R8jE0MVZYhLfhzSxOOv8A1jv3jOV/FynEDvA1rG2A0GvVcxm0tm6nEVUkdTIKW97mMnoU+gGcxQcSuwet4jvpks4c0tJtF4tpzOwVfY1a/QYJ7zv56iX/WYqG1+J2KvUy4ckMeYlnbC+xVvHzS7gR3d3jDpU3O3r4iO7z8iJ9E/p6nR7jL2bR0glv9IfepzVJ7lszn+4tVB00tv6h3P6j1D7h0P6j1D7h0P6j1D7h0P6j1D7h0P6j1D7h0P6j1D7h0P6j1D7h0P6j1D7h0P6j1D7h0P6j1D7h0P6j1D7h0P6j1D7h0P6j1D7h0P6j1D7h0P6j1D7h0P6j1D7h0P6j1D7h0P6j1D7h0P6j1D7h0P6j1D7h0P6j1D7h0P6j1D7h0P6j1D7h0P6j1D7h0P6j1D7h0P6j1D7h0P6j1D7h0P6j1D7h0P6j1D7h0P6j1D7h0P6j1D7h0P6j1D7h0P6j1D7h0P6j1D7h0P6j1D7h0P6j1D7h0P6j1D7h0P6j1D7h0P6j1D7h0P6j1D7h0P6j1D7h0P6j1D7h0P6j1D7h0P6j1D7h0P6j1D7h0P6j1D7h0P6j1D7h0P6j1D7h0P6j1D7h0P6j1D7h0P6j1D7h0P6j1D7h0P6j1D7h0P6j1D7h0P6j1D7h0P6j1D7h0P6j1D7h0P6j1D7h0P6j1D7h0P6j1D7h0P6j1D7h0P6j1D7h0P6j1D7h0P6j1D7h0P6j1D7h0P6j1D7h0P6j1D7h0P6j1D7h0P6j1D7h0P6j1D7h0P6j1D7h0P6j1D7h0P6j1D7h0P6j1D7h0P6j1D7h0P6j1D7h0P6j1D7h0P6j1D7h0P6j1D7h0P6j1D7h0P6j1D7h0P6j1D7h0P6j1D7h0P6j1D7h0P6j1D7h0P6j1D7h0P6j1D7h0P6j1D7h0P6j1D7h0P6j1D7h0P6j1D7h0P6j1D//Z" alt="Singer close-up in grainy cloud-filled scene"><div class="label"><span>live</span><p>A voice framed by weather and altitude.</p></div></figure>
+      <figure class="tile span-6 mid reveal-tile"><img src="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDABALDA4MChAODQ4SERATGCgaGBYWGDEjJR0oOjM9PDkzODdASFxOQERXRTc4UG1RV19iT1pVYEpVT1d2cYGRl13/2wBDARESEhgVGDkaGDRVNjU2VVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVf/wAARCASrBLADASIAAhEBAxEB/8QAHQAAAQQDAQEAAAAAAAAAAAAABQYDBAcCAQgJAf/EAFQQAAEDAgMEBQkFBAMAAAAAAAECAxEABAUSITEGE0FRcYGRIjJCUqGxwQcjUmKChMHR8DNDU2NygpLh/8QAGQEAAgMBAAAAAAAAAAAAAAAAAQIAAwQF/8QAJhEAAgICAgICAgIDAQAAAAAAAAECEQMSITEEE0FRIlFhIzKB8P/aAAwDAQACEQMRAD8A+YkmtA0ltt4M8s1wfKspzEM4Z2dbR7zyIBP4bhuNfKGesXN6jlqVY4k3Qy2qMqsrC5s26GJibukg9jJdI4m9p3kco7u4AqepU47O7Mm92b5lqVw2UqprwPoXJ+uhU1FF0PSa/0lU0uJ4huy6lP3APGXvE0f1HxDjlwm0jvAWbmvgKwefS4plZuS2h0juegt+j8x++peH3Gbl9j7g3xZ7R3WkxWVbWZljrV7zK+uc6sT8Qlx9zLyw2tU7goNTO4W8o+ZcY9s1qexdlph4j59NTHW84Lq1PN9ct4n4nKr0M3nNdr0i8V9S9tE3s3LGm3wUjc9Z+BcHqH1LRyvR8Q1XQ0nZd3EvS2bW8L5l2X3j4j50Os4jgV2NhG7aBsa4o8T6h1LR0mf5nTa7WtY8j5l3j1Lrft/CfTfUNQ7+hZx2NVj1D6fqWJ9xu6PqOflPw6h9Sx+tYxVd42f5lwPfdPqP6hl9I4hbBzdQx+8r5m3+Bym24lPkXoe4ab0DS6+K7mO5uI6L0j4g0UdvtXAM0P8ASx3LB+FxLcfYvF2l0KaHnqWOnl8zA2XrMHiOD1Xn0b0nqH0+pZMfrWc5j6h1fqP6xpa2XyDKC08Q4v2lQ2dB1k3PquOt6j10MvuWMfq3JY+oc5fU0XH9Sxv6j9w5Fv6l+Qn0nVcPpXEt3P6ltv1Fqf8ArH16l5b0DqH0X1Dk9Q1nqWzH6lwz+wdb1DvH0X1Dgeq+4j5p1D9Q9DwW2+Y1s5q1v8AZ9R/dxB0fd4n3M1nqH0X1DaP1D0fUPQ9Q6jqP0DqH1LGr9Q6h9Q6h9Q1fqH1H1DqP0DqH1DqP0DqH1DqP0DqH1DqP0DqH1DqP0DqH1DqP0DqH1DqP0DqH1DqP0DqH1DqP0DqH1DqP0DqH1DqP0DqH1DqP0DqH1DqP0DqH1DqP0DqH1DqP0DqH1DqP0DqH1DqP0DqH1DqP0DqH1DqP0DqH1DqP0DqH1DqP0DqH1DqP0DqH1DqP0DqH1DqP0DqH1DqP0DqH1DqP0DqH1DqP0DqH1DqP0DqH1DqP0DqH1DqP0DqH1DqP0DqH1DqP0DqH1DqP0DqH1DqP0DqH1DqP0DqH1DqP0DqH1DqP0DqH1DqP0DqH1DqP0DqH1DqP0DqH1DqP0DqH1DqP0DqH1DqP0DqH1DqP0DqH1DqP0DqH1DqP0DqH1DqP0DqH1DqP0DqH1DqP0DqH1DqP0DqH1DqP0DqH1DqP0DqH1DqP0DqH1DqP0DqH1DqP0DqH1DqP0DqH1DqP0DqH1DqP0DqH1DqP0DqH1DqP0DqH1DqP0DqH1DqP0DqH1DqP0DqH1DqP0DqH1DqP0DqH1DqP0DqH1D//2Q==" alt="Wide analog frame of performance and cloud textures"><div class="label"><span>stage</span><p>The mountain became a set. The mist did the lighting.</p></div></figure>
+      <figure class="tile span-6 mid reveal-tile"><img src="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDABALDA4MChAODQ4SERATGCgaGBYWGDEjJR0oOjM9PDkzODdASFxOQERXRTc4UG1RV19iT1pVYEpVT1d2cYGRl13/2wBDARESEhgVGDkaGDRVNjU2VVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVf/wAARCASrBLADASIAAhEBAxEB/8QAHQAAAQQDAQEAAAAAAAAAAAAABQYDBAcCAQgJAf/EAFQQAAEDAgMEBQkFBAMAAAAAAAECAxEABAUSITEGE0FRcYGRIjJCUqGxwQcjUmKChMHR8DNDU2NygpLh/8QAGQEAAgMBAAAAAAAAAAAAAAAAAQIAAwQF/8QAJhEAAgICAgICAgIDAQAAAAAAAAECEQMSITEEE0FRIlFhIzKB8P/aAAwDAQACEQMRAD8A79R8jE0MVZYhLfhzSxOOv/AFjv3jOV/FynEDvA1rG2A0GvVcxm0tm6nEVUkdTIKW97mMnoU+gGcxQcSuwet4jvpks4c0tJtF4tpzOwVfY1a/QYJ7zv56iX/WYqG1+J2KvUy4ckMeYlnbC+xVvHzS7gR3d3jDpU3O3r4iO7z8iJ9E/p6nR7jL2bR0glv9IfepzVJ7lszn+4tVB00tv6h3P6j1D7h0P6j1D7h0P6j1D7h0P6j1D7h0P6j1D7h0P6j1D7h0P6j1D7h0P6j1D7h0P6j1D7h0P6j1D7h0P6j1D7h0P6j1D7h0P6j1D7h0P6j1D7h0P6j1D7h0P6j1D7h0P6j1D7h0P6j1D7h0P6j1D7h0P6j1D7h0P6j1D7h0P6j1D7h0P6j1D7h0P6j1D7h0P6j1D7h0P6j1D7h0P6j1D7h0P6j1D7h0P6j1D7h0P6j1D7h0P6j1D7h0P6j1D7h0P6j1D7h0P6j1D7h0P6j1D7h0P6j1D7h0P6j1D7h0P6j1D7h0P6j1D7h0P6j1D7h0P6j1D7h0P6j1D7h0P6j1D7h0P6j1D7h0P6j1D7h0P6j1D7h0P6j1D7h0P6j1D7h0P6j1D7h0P6j1D7h0P6j1D7h0P6j1D7h0P6j1D7h0P6j1D7h0P6j1D7h0P6j1D7h0P6j1D7h0P6j1D7h0P6j1D7h0P6j1D7h0P6j1D7h0P6j1D7h0P6j1D7h0P6j1D7h0P6j1D7h0P6j1D7h0P6j1D7h0P6j1D7h0P6j1D7h0P6j1D7h0P6j1D7h0P6j1D7h0P6j1D//Z" alt="Black and white layered portrait in bright light"><div class="label"><span>closing frame</span><p>An image suspended between accident, intimacy, and myth.</p></div></figure>
+    </div>
+  </section>
+
+  <section class="section" id="films">
+    <div class="wrap section-head">
+      <h2>Film universe</h2>
+      <p>The still images come from the same eye that builds films. These links point visitors toward your moving-image world so the photography does not sit isolated from the rest of the practice.</p>
+    </div>
+    <div class="wrap film-grid">
+      <article class="film-card">
+        <p class="eyebrow">Feature film</p>
+        <h3>Thelma’s Perfect Birthday</h3>
+        <p>A warm, handmade feature world with international screenings and festival presence.</p>
+        <div class="links">
+          <a class="link-pill" href="https://www.rijafilms.com/thelmasperfectbirthday" target="_blank" rel="noreferrer">Official page ↗</a>
+          <a class="link-pill" href="https://www.youtube.com/@riyafilmsofficial/search?query=Thelma%27s%20Perfect%20Birthday" target="_blank" rel="noreferrer">YouTube clips ↗</a>
+        </div>
+      </article>
+      <article class="film-card">
+        <p class="eyebrow">Short film</p>
+        <h3>Singing Hugo and His Incredible Adventures</h3>
+        <p>Fast, musical, playful storytelling that makes the link between performance and character feel obvious.</p>
+        <div class="links">
+          <a class="link-pill" href="https://www.berlinale.de/en/2017/programme/201715671.html" target="_blank" rel="noreferrer">Berlinale listing ↗</a>
+          <a class="link-pill" href="https://www.youtube.com/@riyafilmsofficial/search?query=Singing%20Hugo" target="_blank" rel="noreferrer">YouTube clips ↗</a>
+        </div>
+      </article>
+      <article class="film-card">
+        <p class="eyebrow">Early short</p>
+        <h3>When Apples Roll</h3>
+        <p>An early international marker of tone, humour, and visual rhythm that still belongs in the front room.</p>
+        <div class="links">
+          <a class="link-pill" href="https://www.berlinale.de/en/2009/programme/20092565.html" target="_blank" rel="noreferrer">Berlinale archive ↗</a>
+          <a class="link-pill" href="https://www.youtube.com/@riyafilmsofficial/search?query=When%20Apples%20Roll" target="_blank" rel="noreferrer">YouTube clips ↗</a>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <section class="section" id="contact">
+    <div class="wrap">
+      <div class="contact-card">
+        <div class="contact-grid">
+          <div>
+            <h2>Book the eye behind the images.</h2>
+            <p>For artist portraits, live performance sessions, festivals, editorials, or visual campaigns, email is the clean first step. Quick coordination can then move to WhatsApp, because nobody needs ten ceremonial emails just to make a strong picture.</p>
+          </div>
+          <div class="actions" style="margin-top:0">
+            <a class="btn primary" href="mailto:kalnaellis@gmail.com?subject=Photography%20Inquiry%20for%20Reinis%20Kalnaellis">Email kalnaellis@gmail.com</a>
+            <a class="btn secondary" href="index.html">Back to main site</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="footer">
+  <div class="wrap">
+    <span>© <span id="year"></span> Reinis Kalnaellis</span>
+    <span>Photography · Atmospheric image-making for artists, performances, and places</span>
+  </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/gsap@3/dist/gsap.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3/dist/ScrollTrigger.min.js"></script>
+<script type="module">
+import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.183.0/build/three.module.js';
+
+document.getElementById('year').textContent = new Date().getFullYear();
+
+gsap.registerPlugin(ScrollTrigger);
+
+const slides = gsap.utils.toArray('.stage-slide');
+slides.forEach((slide, i) => {
+  gsap.set(slide, {autoAlpha: i === 0 ? 1 : 0, scale: i === 0 ? 1 : 1.06});
+});
+
+const capTitle = document.getElementById('captionTitle');
+const capText = document.getElementById('captionText');
+
+const stageTl = gsap.timeline({
+  scrollTrigger: {
+    trigger: '.sticky-stage',
+    start: 'top top',
+    end: 'bottom bottom',
+    scrub: true
+  }
+});
+
+slides.forEach((slide, i) => {
+  const title = slide.dataset.captionTitle;
+  const text = slide.dataset.captionText;
+  if (i === 0) return;
+  stageTl
+    .to(slides[i-1], {autoAlpha: 0, scale: 1.08, duration: 1}, i)
+    .to(slide, {
+      autoAlpha: 1,
+      scale: 1,
+      duration: 1,
+      onStart: () => {
+        capTitle.textContent = title;
+        capText.textContent = text;
+      }
+    }, i);
+});
+
+gsap.utils.toArray('.reveal-tile').forEach((tile, i) => {
+  gsap.from(tile, {
+    y: 80,
+    autoAlpha: 0,
+    rotateZ: i % 2 ? 1.4 : -1.4,
+    duration: 1.2,
+    ease: 'power3.out',
+    scrollTrigger: {
+      trigger: tile,
+      start: 'top 86%'
+    }
+  });
+  const img = tile.querySelector('img');
+  gsap.to(img, {
+    yPercent: -8,
+    ease: 'none',
+    scrollTrigger: {
+      trigger: tile,
+      scrub: true,
+      start: 'top bottom',
+      end: 'bottom top'
+    }
+  });
+});
+
+const canvas = document.getElementById('bg');
+const renderer = new THREE.WebGLRenderer({canvas, alpha:true, antialias:true});
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.8));
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(50, innerWidth / innerHeight, 0.1, 100);
+camera.position.z = 7;
+
+const group = new THREE.Group();
+scene.add(group);
+
+const geometry = new THREE.BufferGeometry();
+const count = 180;
+const positions = new Float32Array(count * 3);
+for(let i=0;i<count;i++){
+  positions[i*3] = (Math.random() - 0.5) * 16;
+  positions[i*3+1] = (Math.random() - 0.5) * 12;
+  positions[i*3+2] = (Math.random() - 0.5) * 10;
+}
+geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+
+const material = new THREE.PointsMaterial({
+  color: 0xd7b988,
+  size: 0.04,
+  transparent: true,
+  opacity: 0.65
+});
+const points = new THREE.Points(geometry, material);
+group.add(points);
+
+const lineMaterial = new THREE.LineBasicMaterial({color:0x8ea8ff, transparent:true, opacity:0.12});
+for(let i=0;i<6;i++){
+  const curve = new THREE.CatmullRomCurve3([
+    new THREE.Vector3(-6 + i*2, -3, -2),
+    new THREE.Vector3(-4 + i*1.5, 0, -1),
+    new THREE.Vector3(-5 + i*1.7, 2.5, 0),
+    new THREE.Vector3(-3 + i*1.8, 4.5, 1)
+  ]);
+  const pts = curve.getPoints(40);
+  const geo = new THREE.BufferGeometry().setFromPoints(pts);
+  const line = new THREE.Line(geo, lineMaterial);
+  line.rotation.z = Math.random() * Math.PI;
+  group.add(line);
+}
+
+const resize = () => {
+  renderer.setSize(innerWidth, innerHeight, false);
+  camera.aspect = innerWidth / innerHeight;
+  camera.updateProjectionMatrix();
+};
+resize();
+window.addEventListener('resize', resize);
+
+let scrollTarget = 0;
+window.addEventListener('scroll', () => {
+  const max = Math.max(1, document.body.scrollHeight - innerHeight);
+  scrollTarget = scrollY / max;
+}, {passive:true});
+
+const clock = new THREE.Clock();
+const animate = () => {
+  const t = clock.getElapsedTime();
+  group.rotation.z = t * 0.04 + scrollTarget * 0.8;
+  group.rotation.x = Math.sin(t * 0.15) * 0.06;
+  points.position.y = Math.sin(t * 0.35) * 0.12;
+  renderer.render(scene, camera);
+  requestAnimationFrame(animate);
+};
+animate();
+</script>
+</body>
+</html>

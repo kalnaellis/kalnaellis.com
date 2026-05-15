@@ -700,12 +700,13 @@ const loader = new THREE.TextureLoader();
 const panels = [];
 
 function makePanel(slide, index) {
+  const isMaker = slide.id === 'maker';
   const tex = loader.load(slide.image);
   tex.colorSpace = THREE.SRGBColorSpace;
   tex.anisotropy = renderer.capabilities.getMaxAnisotropy();
 
   const aspect = 2.36;
-  const width = 9.8;
+  const width = isMaker ? 8.9 : 9.8;
   const height = width / aspect;
   const geometry = new THREE.PlaneGeometry(width, height, 40, 12);
   const material = new THREE.MeshBasicMaterial({
@@ -716,11 +717,11 @@ function makePanel(slide, index) {
 
   const mesh = new THREE.Mesh(geometry, material);
   const z = -index * 8.4;
-  const x = Math.sin(index * 0.95) * 2.2;
-  const y = Math.cos(index * 0.62) * 0.28;
+  const x = isMaker ? 1.1 : Math.sin(index * 0.95) * 2.2;
+  const y = isMaker ? 0.18 : Math.cos(index * 0.62) * 0.28;
   mesh.position.set(x, y, z);
-  mesh.rotation.y = THREE.MathUtils.degToRad(Math.sin(index * 0.8) * 10);
-  mesh.rotation.x = THREE.MathUtils.degToRad(Math.cos(index) * 1.8);
+  mesh.rotation.y = THREE.MathUtils.degToRad(isMaker ? 0 : Math.sin(index * 0.8) * 10);
+  mesh.rotation.x = THREE.MathUtils.degToRad(isMaker ? 0 : Math.cos(index) * 1.8);
 
   const frameGeo = new THREE.PlaneGeometry(width + .16, height + .16);
   const frameMat = new THREE.MeshBasicMaterial({
